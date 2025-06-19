@@ -35,7 +35,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AddPatientDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, String, Sexe, LocalDate, String, String) -> Unit
+    onConfirm: (String, String, Sexe, LocalDate, String, String, String) -> Unit
 ) {
     var nom by remember { mutableStateOf("") }
     var prenom by remember { mutableStateOf("") }
@@ -43,11 +43,13 @@ fun AddPatientDialog(
     var dateNaissance by remember { mutableStateOf(LocalDate.of(2000, 1, 1)) }
     var profession by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("+237 ") }
     
     var nomError by remember { mutableStateOf(false) }
     var prenomError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var professionError by remember { mutableStateOf(false) }
+    var phoneNumberError by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -59,7 +61,7 @@ fun AddPatientDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(vertical = 16.dp)
             ) {
                 OutlinedTextField(
                     value = nom,
@@ -174,6 +176,18 @@ fun AddPatientDialog(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                PhoneNumberInput(
+                    phoneNumber = phoneNumber,
+                    onPhoneNumberChange = { 
+                        phoneNumber = it
+                        phoneNumberError = it.substringAfter(" ").length < 9
+                    },
+                    isError = phoneNumberError,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
@@ -181,11 +195,13 @@ fun AddPatientDialog(
                 onClick = {
                     nomError = nom.isBlank()
                     prenomError = prenom.isBlank()
-                    professionError = profession.isBlank()
                     emailError = !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                    professionError = profession.isBlank()
+                    phoneNumberError = phoneNumber.substringAfter(" ").length < 9
                     
-                    if (!nomError && !prenomError && !professionError && !emailError) {
-                        onConfirm(nom, prenom, sexe, dateNaissance, profession, email)
+                    if (!nomError && !prenomError && !emailError && !professionError && !phoneNumberError) {
+                        onConfirm(nom, prenom, sexe, dateNaissance, profession, email, phoneNumber)
+                        onDismiss()
                     }
                 }
             ) {

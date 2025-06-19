@@ -133,24 +133,25 @@ class PatientViewModel(private val repository: PatientRepository) : ViewModel() 
         sexe: Sexe,
         dateNaissance: LocalDate,
         profession: String,
-        email: String
+        email: String,
+        phoneNumber: String
     ) {
         viewModelScope.launch {
-            val patient = Patient(
-                nom = nom,
-                prenom = prenom,
-                sexe = sexe,
-                dateNaissance = dateNaissance,
-                profession = profession,
-                email = email
-            )
-            
-            if (!repository.patientExists(nom, prenom, dateNaissance)) {
-                repository.insertPatient(patient)
+            try {
+                repository.insertPatient(
+                    Patient(
+                        nom = nom,
+                        prenom = prenom,
+                        sexe = sexe,
+                        dateNaissance = dateNaissance,
+                        profession = profession,
+                        email = email,
+                        phoneNumber = phoneNumber
+                    )
+                )
                 _showAddPatientDialog.value = false
-                _errorMessage.value = null
-            } else {
-                _errorMessage.value = "Ce patient existe déjà dans la base de données.\nUn patient avec le même nom (${patient.nom}), prénom (${patient.prenom}) et date de naissance (${patient.dateNaissance}) est déjà enregistré."
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur lors de l'ajout du patient: ${e.message}"
             }
         }
     }
@@ -194,33 +195,27 @@ class PatientViewModel(private val repository: PatientRepository) : ViewModel() 
         sexe: Sexe,
         dateNaissance: LocalDate,
         profession: String,
-        email: String
+        email: String,
+        phoneNumber: String
     ) {
         viewModelScope.launch {
-            val updatedPatient = Patient(
-                id = id,
-                nom = nom,
-                prenom = prenom,
-                sexe = sexe,
-                dateNaissance = dateNaissance,
-                profession = profession,
-                email = email
-            )
-
-            // Vérifier si un autre patient avec les mêmes informations existe déjà
-            val exists = repository.patientExists(nom, prenom, dateNaissance)
-            val currentPatient = repository.getPatientById(id)
-
-            // Permettre la mise à jour si c'est le même patient ou si aucun doublon n'existe
-            if (!exists || (currentPatient?.nom?.equals(nom, true) == true && 
-                          currentPatient.prenom.equals(prenom, true) && 
-                          currentPatient.dateNaissance == dateNaissance)) {
-                repository.updatePatient(updatedPatient)
+            try {
+                repository.updatePatient(
+                    Patient(
+                        id = id,
+                        nom = nom,
+                        prenom = prenom,
+                        sexe = sexe,
+                        dateNaissance = dateNaissance,
+                        profession = profession,
+                        email = email,
+                        phoneNumber = phoneNumber
+                    )
+                )
                 _showEditDialog.value = false
                 _patientToEdit.value = null
-                _errorMessage.value = null
-            } else {
-                _errorMessage.value = "Un autre patient avec le même nom (${updatedPatient.nom}), prénom (${updatedPatient.prenom}) et date de naissance (${updatedPatient.dateNaissance}) existe déjà."
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur lors de la mise à jour du patient: ${e.message}"
             }
         }
     }

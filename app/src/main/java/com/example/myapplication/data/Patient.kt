@@ -14,7 +14,8 @@ data class Patient(
     val sexe: Sexe,
     val dateNaissance: LocalDate,
     val profession: String,
-    val email: String
+    val email: String,
+    val phoneNumber: String // Format: "+237 612345678"
 ) {
     val nomComplet: String
         get() = "$prenom $nom"

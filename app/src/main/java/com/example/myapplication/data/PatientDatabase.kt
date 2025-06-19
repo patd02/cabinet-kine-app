@@ -6,9 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import java.time.LocalDate
 
-@Database(entities = [Patient::class], version = 1, exportSchema = false)
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE patients ADD COLUMN phoneNumber TEXT NOT NULL DEFAULT ''")
+    }
+}
+
+@Database(entities = [Patient::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class PatientDatabase : RoomDatabase() {
     abstract fun patientDao(): PatientDao
@@ -24,6 +32,7 @@ abstract class PatientDatabase : RoomDatabase() {
                     PatientDatabase::class.java,
                     "patient_database"
                 )
+                .addMigrations(MIGRATION_1_2)
                 .build()
                 .also { Instance = it }
             }

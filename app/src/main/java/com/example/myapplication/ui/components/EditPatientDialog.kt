@@ -35,7 +35,7 @@ import java.time.format.DateTimeFormatter
 fun EditPatientDialog(
     patient: Patient,
     onDismiss: () -> Unit,
-    onConfirm: (Long, String, String, Sexe, LocalDate, String, String) -> Unit
+    onConfirm: (Long, String, String, Sexe, LocalDate, String, String, String) -> Unit
 ) {
     var nom by remember { mutableStateOf(patient.nom) }
     var prenom by remember { mutableStateOf(patient.prenom) }
@@ -43,11 +43,13 @@ fun EditPatientDialog(
     var dateNaissance by remember { mutableStateOf(patient.dateNaissance) }
     var profession by remember { mutableStateOf(patient.profession) }
     var email by remember { mutableStateOf(patient.email) }
+    var phoneNumber by remember { mutableStateOf(patient.phoneNumber) }
     
     var nomError by remember { mutableStateOf(false) }
     var prenomError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var professionError by remember { mutableStateOf(false) }
+    var phoneNumberError by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -59,7 +61,7 @@ fun EditPatientDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(vertical = 16.dp)
             ) {
                 OutlinedTextField(
                     value = nom,
@@ -178,6 +180,18 @@ fun EditPatientDialog(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                PhoneNumberInput(
+                    phoneNumber = phoneNumber,
+                    onPhoneNumberChange = { 
+                        phoneNumber = it
+                        phoneNumberError = it.substringAfter(" ").length < 9
+                    },
+                    isError = phoneNumberError,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
@@ -185,11 +199,13 @@ fun EditPatientDialog(
                 onClick = {
                     nomError = nom.isBlank()
                     prenomError = prenom.isBlank()
-                    professionError = profession.isBlank()
                     emailError = !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                    professionError = profession.isBlank()
+                    phoneNumberError = phoneNumber.substringAfter(" ").length < 9
                     
-                    if (!nomError && !prenomError && !professionError && !emailError) {
-                        onConfirm(patient.id, nom, prenom, sexe, dateNaissance, profession, email)
+                    if (!nomError && !prenomError && !emailError && !professionError && !phoneNumberError) {
+                        onConfirm(patient.id, nom, prenom, sexe, dateNaissance, profession, email, phoneNumber)
+                        onDismiss()
                     }
                 }
             ) {

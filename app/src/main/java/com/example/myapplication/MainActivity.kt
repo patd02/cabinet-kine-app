@@ -123,14 +123,15 @@ class MainActivity : ComponentActivity() {
                             if (showAddDialog) {
                                 AddPatientDialog(
                                     onDismiss = { viewModel.onAddPatientDialogDismiss() },
-                                    onConfirm = { nom, prenom, sexe, dateNaissance, profession, email ->
+                                    onConfirm = { nom, prenom, sexe, dateNaissance, profession, email, phoneNumber ->
                                         viewModel.addPatient(
                                             nom = nom,
                                             prenom = prenom,
                                             sexe = sexe,
                                             dateNaissance = dateNaissance,
                                             profession = profession,
-                                            email = email
+                                            email = email,
+                                            phoneNumber = phoneNumber
                                         )
                                     }
                                 )
@@ -150,7 +151,7 @@ class MainActivity : ComponentActivity() {
                                     EditPatientDialog(
                                         patient = patient,
                                         onDismiss = { viewModel.onEditDialogDismiss() },
-                                        onConfirm = { id, nom, prenom, sexe, dateNaissance, profession, email ->
+                                        onConfirm = { id, nom, prenom, sexe, dateNaissance, profession, email, phoneNumber ->
                                             viewModel.onUpdatePatient(
                                                 id = id,
                                                 nom = nom,
@@ -158,7 +159,8 @@ class MainActivity : ComponentActivity() {
                                                 sexe = sexe,
                                                 dateNaissance = dateNaissance,
                                                 profession = profession,
-                                                email = email
+                                                email = email,
+                                                phoneNumber = phoneNumber
                                             )
                                         }
                                     )
